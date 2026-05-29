@@ -114,5 +114,5 @@ def webhook():
     return "ok", 200
 
 # خط زیر بسیار مهم است: دو زیرخط قبل و بعد از name
-__if name == "__main__":
+if __name__ == "main":
     app.run(host='0.0.0.0', port=5000)
