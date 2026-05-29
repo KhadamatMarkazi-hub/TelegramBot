@@ -1,15 +1,13 @@
 import os
 import random
 import requests
-from flask import Flask, request, jsonify
+from flask import Flask, request
 
 app = Flask(__name__)
 
-# تنظیمات
-TOKEN = os.environ.get('TOKEN', '123456:ABC') # اگر توکن ست نکردی، از یک مقدار پیش‌فرض استفاده می‌کند
+TOKEN = os.environ.get('TOKEN')
 URL = f"https://api.telegram.org/bot{TOKEN}/"
 
-# لینک‌های کانال
 CHANNEL_LINKS = [
     ("هاب مرکزی دانشجویان سمنان", "https://t.me/+h9Zkeu7nolZlOTVk"),
     ("بانک املاک سمنان", "https://t.me/+FiF2mt4xlyUwNDQ8"),
@@ -17,7 +15,6 @@ CHANNEL_LINKS = [
     ("تابلو اعلانات سمنان", "https://t.me/+ZasLGaGAUzk4OGFk")
 ]
 
-# پیشوندها
 CODE_PREFIXES = {
     "دانشجو": "UID",
     "دانش آموز": "SID",
@@ -26,18 +23,7 @@ CODE_PREFIXES = {
     "سایر": "AID"
 }
 
-def get_db():
-    conn = requests.get("http://localhost:5000/init_db") # فقط برای تست محلی، در رندر دیتابیس فایل‌محور است
-    # در رندر، دیتابیس SQLite معمولاً روی حافظه موقت است که با ریستارت پاک می‌شود.
-    # اما برای این تمرین، فرض می‌کنیم فایل users.db ایجاد می‌شود.
-    return requests # اینجا پیچیده می‌شود، بیایم ساده کنیم
-
-# برای سادگی و عدم وابستگی به دیتابیس فایل در محیط‌های Cloudless، 
-# ما از یک دیکشنری موقت استفاده می‌کنیم (چون رندر هر بار ریست می‌شود).
-# اما اگر می‌خواهی دیتابیس واقعی داشته باشی، باید از یک سرویس دیتابیس ابری مثل Supabase استفاده کنی.
-# من کد را طوری می‌نویسم که با فایل users.db کار کند، اما در رندر ممکن است پاک شود.
-
-users_db = {} # دیکشنری موقت برای ذخیره اطلاعات (چون در رندر فایل‌ها ممکن است پاک شوند)
+users_db = {}
 
 def send_message(chat_id, text, reply_markup=None):
     payload = {'chat_id': chat_id, 'text': text}
@@ -72,11 +58,9 @@ def webhook():
     data = request.json
     if "message" in data:
         message = data["message"]
-
         chat_id = message["chat"]["id"]
         text = message.get("text")
 
-        # اگر کاربر در دیکشنری نیست، او را بساز
         if chat_id not in users_db:
             users_db[chat_id] = {"step": 0, "name": "", "phone": "", "birthdate": "", "group": "", "unique_code": ""}
 
@@ -101,6 +85,7 @@ def webhook():
             elif current_step == 2:
                 user["phone"] = text
                 user["step"] = 3
+
                 send_message(chat_id, "تاریخ تولد خود را به صورت کامل وارد کنید (مثلا ۱۴۰۰/۰۱/۰۱):")
 
             elif current_step == 3:
@@ -128,5 +113,6 @@ def webhook():
 
     return "ok", 200
 
+# خط زیر بسیار مهم است: دو زیرخط قبل و بعد از name
 if name == "__main__":
     app.run(host='0.0.0.0', port=5000)
