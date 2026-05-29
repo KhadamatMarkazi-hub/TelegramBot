@@ -1,7 +1,4 @@
-flask
-requests
-gunicorn
 pyTelegramBotAPI
-   Flask
-   pymongo
-   dnspython
+Flask
+pymongo
+dnspython
