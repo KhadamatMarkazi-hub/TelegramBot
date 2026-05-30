@@ -1,5 +1,4 @@
-pyTelegramBotAPI
-Flask
-pymongo
-dnspython
-gunicorn
+ pyTelegramBotAPI
+   flask
+   pymongo
+   gunicorn
