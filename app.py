@@ -114,7 +114,7 @@ def home():
 def run_bot():
     bot.infinity_polling(non_stop=True)
 
-if _name == "__main__":
+if __name__ == "__main__":
     # اجرای ربات در یک Thread جداگانه
     threading.Thread(target=run_bot).start()
     # اجرای Flask روی پورتی که رندر می‌خواهد
